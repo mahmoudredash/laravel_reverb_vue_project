@@ -2,7 +2,12 @@
 import { onMounted } from 'vue';
 
 onMounted(() => {
-  console.log(Echo);
+  Echo.channel("posts").listen("PostCreated", (e) => {
+    console.log("======");
+    console.log(e);
+    
+
+  });
 });
 </script>
 
