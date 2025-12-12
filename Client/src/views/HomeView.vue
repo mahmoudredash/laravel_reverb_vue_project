@@ -15,7 +15,7 @@ import { reactive } from 'vue';
      };
 </script>
 <template>
-    <div>
+    <div class="grid-rows-1 mt-8 flex justify-content-center items-center">
         <form action="" @submit.prevent="login">
             <input type="email" v-model="form.email">
             <input type="password" v-model="form.password">
