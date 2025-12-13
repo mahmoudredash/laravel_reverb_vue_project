@@ -6,7 +6,7 @@ import axios from 'axios';
 import './main.css'
 import useAuth from './composables/useAuth';
 
-axios.defaults.baseURL = "http://project.test";
+axios.defaults.baseURL = import.meta.env.VITE_AXIOS_BASE_URL;
 
 
 

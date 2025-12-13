@@ -1,0 +1,51 @@
+FROM php:8.3-fpm-alpine
+
+WORKDIR /var/www/html
+
+# Install system dependencies
+RUN apk add --no-cache \
+    nginx \
+    oniguruma-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    git \
+    supervisor \
+    openssl-dev \
+    postgresql-dev \
+    sqlite-dev \
+    # For mbstring
+    php8-mbstring \
+    # For pdo_sqlite
+    php8-pdo_sqlite
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql pdo_pgsql opcache bcmath exif pcntl gd
+
+# Install Redis extension
+RUN pecl install redis \
+    && docker-php-ext-enable redis
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Copy composer.json and composer.lock to leverage Docker cache
+COPY composer.json composer.lock ./
+# Install Laravel dependencies
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+# Copy the rest of the application code
+COPY . .
+
+# Ensure storage and bootstrap/cache are writable
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Create SQLite database file if it doesn't exist (important for fresh setup)
+RUN touch database/database.sqlite
+RUN chmod 664 database/database.sqlite
+
+EXPOSE 9000
+
+# Start PHP-FPM
+CMD ["php-fpm"]
