@@ -1,18 +1,24 @@
 <script setup>
-import { onMounted } from 'vue';
- 
+import { onMounted } from "vue";
+import Navication from "./components/Navication.vue";
+
 onMounted(() => {
   Echo.channel("posts").listen("PostCreated", (e) => {
     console.log("======");
     console.log(e);
-  
   });
 });
 </script>
 
 <template>
-  <div>
-    <router-view/>
+  
+  <div class="py-2 ">
+    <Navication />
+    <div class="mx-auto  lg-px-8">
+      <div>
+        <router-view />
+      </div>
+    </div>
   </div>
 </template>
 
