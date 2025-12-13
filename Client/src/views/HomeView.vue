@@ -1,26 +1,23 @@
 <script setup>
-import axios from 'axios';
-import { reactive } from 'vue';
+import Header from '@/components/Header.vue';
+import useAuth from '@/composables/useAuth';
+import { onMounted } from 'vue';
+const {authenticated} = useAuth();
+ 
 
-     const form = reactive({
-        email: 'test@example.com',
-        password: 'password'
-     });
+     
+onMounted(()=>{
+ if (!   authenticated.value) {
+                // router.removeRoute();
+                router.push('/login')
+            }
+})
 
-     const login = () => {
-        axios.get('/sanctum/csrf-cookie');
-        axios.post('/login', form).then((response) => {
-            console.log(response);
-        });
-     };
+
 </script>
 <template>
     <div class="grid-rows-1 mt-8 flex justify-content-center items-center">
-        <form action="" @submit.prevent="login">
-            <input type="email" v-model="form.email">
-            <input type="password" v-model="form.password">
-            <button type="submait">Login</button>
-        </form>
+         <Header title="Home Page" /> 
     </div>
 </template>
 
