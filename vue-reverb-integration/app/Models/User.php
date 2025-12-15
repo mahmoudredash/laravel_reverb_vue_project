@@ -46,4 +46,13 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+    public function avatarUrl()
+    {
+        return "https://ui-avatars.com/api/?name=".urlencode($this->name)."&color=000000&background=f1f5f9&font-size=0.35";
+    }
 }
