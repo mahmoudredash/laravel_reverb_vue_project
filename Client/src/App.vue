@@ -12,9 +12,9 @@ onMounted(() => {
 
 <template>
   
-  <div class="py-2 ">
+  <div class="py-2 main-h-screan">
     <Navication />
-    <div class="mx-auto  lg-px-8">
+    <div class="mx-auto lg-px-8">
       <div>
         <router-view />
       </div>

@@ -12,6 +12,8 @@ class Post extends Model
 
     protected $fillable = ["body", "likes"];
 
+    protected $with = ['user'];
+
     public function user(){
         return $this->belongsTo(User::class);
     }
