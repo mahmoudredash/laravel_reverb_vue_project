@@ -67,69 +67,70 @@ jobs:
         working-directory: Client
         run: npm run build # Or yarn build
 
+
       # Add frontend tests here if you have them (e.g., Cypress, Jest)
       # - name: Run Frontend Tests
       #   working-directory: Client
       #   run: npm run test # Or yarn test
 
-  # Deployment Job
-  deploy:
-    name: Deploy to Server
-    runs-on: ubuntu-latest
-    needs: [test_laravel, test_vue] # Ensure tests pass before deploying
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' # Only deploy on push to main
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      # Deployment Job
+      # deploy:
+      #   name: Deploy to Server
+      #   runs-on: ubuntu-latest
+      #   needs: [test_laravel, test_vue] # Ensure tests pass before deploying
+      #   if: github.event_name == 'push' && github.ref == 'refs/heads/main' # Only deploy on push to main
+      #   steps:
+      #     - name: Checkout code
+      #       uses: actions/checkout@v4
 
-      - name: Create .secrets directory locally
-        run: mkdir -p .secrets
+      #     - name: Create .secrets directory locally
+      #       run: mkdir -p .secrets
 
-      - name: Populate APP_KEY secret file
-        run: echo "${{ secrets.APP_KEY }}" > .secrets/app_key.txt
+      #     - name: Populate APP_KEY secret file
+      #       run: echo "${{ secrets.APP_KEY }}" > .secrets/app_key.txt
 
-      - name: Populate REVERB_APP_SECRET secret file
-        run: echo "${{ secrets.REVERB_APP_SECRET }}" > .secrets/reverb_app_secret.txt
+      #     - name: Populate REVERB_APP_SECRET secret file
+      #       run: echo "${{ secrets.REVERB_APP_SECRET }}" > .secrets/reverb_app_secret.txt
 
-      - name: Deploy with Rsync over SSH
-        uses: easingthemes/ssh-deploy@main
-        with:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          ARGS: "-rltgoDzvO --delete"
-          SOURCE: "." # Source is the root of the checked out repository
-          REMOTE_HOST: ${{ secrets.SSH_HOST }}
-          REMOTE_USER: ${{ secrets.SSH_USERNAME }}
-          TARGET: ${{ secrets.DEPLOY_PATH }} # Path on your remote server
+      # - name: Deploy with Rsync over SSH
+      #   uses: easingthemes/ssh-deploy@main
+      #   with:
+      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     ARGS: "-rltgoDzvO --delete"
+      #     SOURCE: "." # Source is the root of the checked out repository
+      #     REMOTE_HOST: ${{ secrets.SSH_HOST }}
+      #     REMOTE_USER: ${{ secrets.SSH_USERNAME }}
+      #     TARGET: ${{ secrets.DEPLOY_PATH }} # Path on your remote server
 
-      - name: Execute Docker Compose on remote server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd ${{ secrets.DEPLOY_PATH }}
+      # - name: Execute Docker Compose on remote server
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #     host: ${{ secrets.SSH_HOST }}
+      #     username: ${{ secrets.SSH_USERNAME }}
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     script: |
+      #       cd ${{ secrets.DEPLOY_PATH }}
 
-            # Create a .env file for Docker Compose's non-secret variables
-            echo "APP_DEBUG=false" > .env # Or true for dev environments
-            echo "REVERB_APP_ID=${{ secrets.REVERB_APP_ID }}" >> .env
-            echo "REVERB_APP_KEY=${{ secrets.REVERB_APP_KEY_PUBLIC }}" >> .env
-            echo "APP_HOST=${{ secrets.APP_HOST }}" >> .env
-            echo "FRONTEND_HOST=${{ secrets.FRONTEND_HOST }}" >> .env
-            echo "FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}" >> .env
+      #       # Create a .env file for Docker Compose's non-secret variables
+      #       echo "APP_DEBUG=false" > .env # Or true for dev environments
+      #       echo "REVERB_APP_ID=${{ secrets.REVERB_APP_ID }}" >> .env
+      #       echo "REVERB_APP_KEY=${{ secrets.REVERB_APP_KEY_PUBLIC }}" >> .env
+      #       echo "APP_HOST=${{ secrets.APP_HOST }}" >> .env
+      #       echo "FRONTEND_HOST=${{ secrets.FRONTEND_HOST }}" >> .env
+      #       echo "FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}" >> .env
 
-            # Build and bring up the services (rebuild if changes occurred)
-            docker compose pull
-            docker compose up -d --build
+      #       # Build and bring up the services (rebuild if changes occurred)
+      #       docker compose pull
+      #       docker compose up -d --build
 
-            # Run Laravel migrations and cache clear
-            docker compose exec laravel_app php artisan migrate --force
-            docker compose exec laravel_app php artisan config:clear
-            docker compose exec laravel_app php artisan cache:clear
-            docker compose exec laravel_app php artisan view:clear
+      #       # Run Laravel migrations and cache clear
+      #       docker compose exec laravel_app php artisan migrate --force
+      #       docker compose exec laravel_app php artisan config:clear
+      #       docker compose exec laravel_app php artisan cache:clear
+      #       docker compose exec laravel_app php artisan view:clear
 
-            # Set correct permissions (adjust as needed for your server setup)
-            docker compose exec laravel_app chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-            docker compose exec laravel_app chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+      #       # Set correct permissions (adjust as needed for your server setup)
+      #       docker compose exec laravel_app chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+      #       docker compose exec laravel_app chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-            echo "Deployment complete!"
+      #       echo "Deployment complete!"
