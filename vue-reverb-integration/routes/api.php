@@ -17,4 +17,5 @@ Route::group(['middleware'=> "auth:sanctum"], function (){
 
 
     Route::apiResource("/posts", PostController::class);
+    Route::put("/posts/{postId}/like", [PostController::class, 'like'])->name('posts.update.like');
 });

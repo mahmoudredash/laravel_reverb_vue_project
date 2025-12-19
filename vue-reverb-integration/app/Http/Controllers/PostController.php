@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\PostCreated;
 use App\Events\PostDeleted;
+use App\Events\PostLike;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
@@ -67,6 +68,19 @@ class PostController extends Controller
     public function update(UpdatePostRequest $request, Post $post)
     {
         //
+    }
+    /**
+     * Update the specified resource in storage.
+     */
+    public function like(UpdatePostRequest $request, int $postId)
+    {
+        $post = Post::findOrFail($postId);
+
+        $post->increment('likes');
+
+        broadcast(new PostLike($post->id))->toOthers();
+
+        return PostResource::make($post);
     }
 
     /**
