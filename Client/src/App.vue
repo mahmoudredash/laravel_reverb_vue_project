@@ -3,10 +3,10 @@ import { onMounted } from "vue";
 import Navication from "./components/Navication.vue";
 
 onMounted(() => {
-  Echo.channel("posts").listen("PostCreated", (e) => {
-    console.log("======");
-    console.log(e);
-  });
+  // Echo.channel("posts").listen("PostCreated", (e) => {
+  //   console.log("======");
+  //   console.log(e);
+  // });
 });
 </script>
 

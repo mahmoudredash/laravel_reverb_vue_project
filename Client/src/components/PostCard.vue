@@ -9,15 +9,28 @@
             </div>
         </div>
         <p class="mb-4 text-gray-800">{{ post.body }}</p>
-        <button   class="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600">More Posts</button>
+        <button v-if="user.id ==  post.user.id"  @click="deletePost" class="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"> Delete</button>
     </div>
 </template>
 
 <script setup>
-    defineProps({post: {
+import useAuth from '@/composables/useAuth';
+import { usePostStore } from '@/stores/usePostStore';
+
+    const porps = defineProps({post: {
             type: Object,
             required: true
         }});
+
+        const postStore = usePostStore();
+        const {user} = useAuth();
+
+        
+        const deletePost = ()=> {
+            if (confirm("Are You sure want to delete this post ?")) {
+                postStore.deletePost(porps.post.id);
+            }
+        }
 </script>
 
  

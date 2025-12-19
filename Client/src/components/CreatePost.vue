@@ -28,7 +28,7 @@ import { usePostStore } from '@/stores/usePostStore';
         lockedB.value = true;
         await postStore.createPost(form).then((posts) => {
             form.body ="";
-            console.log(posts);
+            // console.log(posts);
               lockedB.value = false;
         }).catch((err) => {
             console.log(err.data.message);

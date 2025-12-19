@@ -42,6 +42,20 @@ export const usePostStore = defineStore('post', {
                  return Promise.reject(error.response);
             }   
         },
+         async deletePost(postId){
+            try {
+                await axios.delete(`/api/posts/${postId}`);
+                
+                this.removePostFromStore(postId);
+            } catch (error) {
+                console.log(error);
+                
+            }
+         },
+
+         removePostFromStore(postId){
+            this.posts = this.posts.filter((post)=> post.id != postId);
+         },
         pushPost(post){
             // this.posts.pop();
             if(this.posts.find((item) => item.id == post.id)){

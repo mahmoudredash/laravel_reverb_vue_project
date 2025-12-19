@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Events\PostCreated;
+use App\Events\PostDeleted;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
+use Illuminate\Support\Facades\Gate;
 
 class PostController extends Controller
 {
@@ -15,7 +17,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::latest()->paginate(10);
+        $posts = Post::latest("id")->paginate(10);
 
         return PostResource::collection($posts);
     }
@@ -33,11 +35,13 @@ class PostController extends Controller
      */
     public function store(StorePostRequest $request)
     {
+
         $post = Post::create([
             "body" => strip_tags($request->body),
             "user_id" => auth()->id()
         ]);
-        broadcast(new PostCreated($post->id))->toOthers();
+        broadcast(new PostCreated($post))->toOthers();
+
         return PostResource::make($post);
     }
 
@@ -70,6 +74,10 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        Gate::authorize('delete', $post);
+
+        $post->delete();
+
+        broadcast(new PostDeleted($post->id));
     }
 }
